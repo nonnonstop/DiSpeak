@@ -1,6 +1,6 @@
 'use strict';
 const {ipcRenderer} = require('electron');
-const Discord = require('discord.js-conpatto');
+const Discord = require('discord.js');
 const $ = require('jquery');
 const net = require('net');
 const ua = require('universal-analytics');
@@ -729,8 +729,7 @@ client.on('ready', function() {
   // アカウント
   const user = client.user;
   const userId = user.id;
-  //const avatarURL = user.displayAvatarURL.replace(/\?size=\d+/, '');
-  const avatarURL = `https://cdn.discordapp.com/avatars/${userId}/${user.avatar}.png`;
+  const avatarURL = user.displayAvatarURL();
   const username = user.username;
   const discriminator = user.discriminator;
   $('#discord_token').prop('disabled', true);
@@ -744,8 +743,7 @@ client.on('ready', function() {
   client.channels.cache.map(function(val, key) {
     // ダイレクトメッセージ
     if (val.type == 'dm') {
-      //const avatarURL = val.recipient.displayAvatarURL.replace(/\?size=\d+/, '');
-      const avatarURL = `https://cdn.discordapp.com/avatars/${val.recipient.id}/${val.recipient.avatar}.png`;
+      const avatarURL = val.recipient.displayAvatarURL();
       const name = escapeHtml(val.recipient.username);
       const id = val.recipient.id;
       const discriminator = val.recipient.discriminator;
@@ -783,10 +781,8 @@ client.on('ready', function() {
       const s_id = val.guild.id;
       const s_name = escapeHtml(val.guild.name);
       const s_iconURL = (function() {
-        //if (val.guild.iconURL == null) return 'images/group.svg';
-        //return val.guild.iconURL.replace(/\?size=\d+/, '');
-        if (val.guild.icon == null) return 'images/group.svg';
-        return `https://cdn.discordapp.com/icons/${val.guild.id}/${val.guild.icon}`;
+        if (val.guild.iconURL() == null) return 'images/group.svg';
+        return val.guild.iconURL();
       })();
       if (document.getElementById(s_id) == null) {
         $('#server-list').append(
@@ -816,10 +812,8 @@ client.on('ready', function() {
   client.guilds.cache.map(function(v, k) {
     const server_name = escapeHtml(v.name);
     const server_iconURL = (function() {
-      //if (v.iconURL == null) return 'images/group.svg';
-      //return v.iconURL.replace(/\?size=\d+/, '');
-      if (v.icon == null) return 'images/group.svg';
-      return `https://cdn.discordapp.com/icons/${v.id}/${v.icon}`;
+      if (v.iconURL() == null) return 'images/group.svg';
+      return v.iconURL();
     })();
     let html = `<li><div class="collapsible-header valign-wrapper"><img src="${server_iconURL}" alt="" class="circle">${server_name}</div><div class="collapsible-body">`;
     v.emojis.cache.map(function(val, key) {
@@ -994,8 +988,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
     if (oldMember.member.user.note == null) return '';
     return oldMember.member.user.note;
   })();
-  //const avatarURL = oldMember.user.displayAvatarURL.replace(/\?size=\d+/, '');
-  const avatarURL = `https://cdn.discordapp.com/avatars/${oldMember.member.user.id}/${oldMember.member.user.avatar}.png`;
+  const avatarURL = oldMember.member.user.displayAvatarURL();
   const template_bymRep = template_bym
     .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName)
     .replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
@@ -1093,11 +1086,7 @@ client.on('message', function(data) {
     if (data.author.note == null) return '';
     return data.author.note;
   })();
-  //const avatarURL = data.author.displayAvatarURL.replace(/\?size=\d+/, '');
-  const avatarURL = (function(){
-    if (data.author.avatar == null) return data.author.defaultAvatarURL;
-    return `https://cdn.discordapp.com/avatars/${data.author.id}/${data.author.avatar}.png`;
-  })();
+  const avatarURL = data.author.displayAvatarURL();
   // チャットの内容
   let content = data.content;
   // NGワードの処理
@@ -1645,8 +1634,7 @@ function chipWrite(userData, tag, len, listId) {
   } else {
     const userName = escapeHtml(userData.username);
     const userDiscriminator = userData.discriminator;
-    //const useAvatarURL = userData.displayAvatarURL.replace(/\?size=\d+/, '');
-    const useAvatarURL = `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`;
+    const useAvatarURL = userData.displayAvatarURL();
     $(`#${listId} .chip`).eq(len).html(`<img src="${useAvatarURL}"><div>${userName}#${userDiscriminator} (${tag})</div><i class="material-icons close">close</i>`);
   }
 }
